@@ -12,3 +12,10 @@ Swift program that:
 …don't judge my code pls i wrote it to procrastinate xx
 
 needs `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_API_TOKEN` to work, just uses the api to check domain availablilty
+
+## example output
+
+```
+Trying word 1: countercultural
+{"registration_cost":"$27.70","domain":"countercultural.site"}
+```
