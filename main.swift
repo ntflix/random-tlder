@@ -39,6 +39,12 @@ struct DomainOutput: Encodable {
     let registration_cost: String
 }
 
+struct StandardErrorStream: TextOutputStream {
+    mutating func write(_ string: String) {
+        fputs(string, stderr)
+    }
+}
+
 enum AppError: Error, CustomStringConvertible {
     case missingEnvironment(String)
     case invalidResponse
@@ -135,9 +141,8 @@ final class RandomWordProvider {
 
 struct DomainFinder {
     static func eprint(_ string: String) {
-        if let data = (string + "\n").data(using: .utf8) {
-            FileHandle.standardError.write(data)
-        }
+        var standardError = StandardErrorStream()
+        print(string, to: &standardError)
     }
 
     static func main() async {
@@ -167,9 +172,12 @@ struct DomainFinder {
                     if let available = results.first(where: { result in
                         result.registrable && (result.tier == nil || result.tier == "standard")
                     }) {
+                        guard let pricing = available.pricing else {
+                            continue
+                        }
 
-                        let currency = available.pricing!.currency
-                        let registrationCost = available.pricing!.registration_cost
+                        let currency = pricing.currency
+                        let registrationCost = pricing.registration_cost
 
                         let output = DomainOutput(
                             domain: available.name,
